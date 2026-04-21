@@ -48,8 +48,10 @@ void getGoalWord(FILE *file, char word[WORD_SIZE])
 void compareWordGuess(char wordGoal[WORD_SIZE], char wordGuess[ROW_SIZE][COL_SIZE])
 {
   int columnPos;
-  int goal = 0;
-  int hint = 1;
+  const int goal = 0;
+  const int hint = 1;
+  printf("\n");
+  
   for (columnPos = 0; columnPos < WORD_SIZE; columnPos++)
   {
     char letterGoal = wordGoal[columnPos];
@@ -57,21 +59,23 @@ void compareWordGuess(char wordGoal[WORD_SIZE], char wordGuess[ROW_SIZE][COL_SIZ
     if (letterGoal == letterGuess)
     {
       wordGuess[goal][columnPos] -= CHANGE_CASE;
+      // Place space char in hint row if found matching letter
+      // This is to make sure the hint row has a printable characters
+      wordGuess[hint][columnPos] = ' ';
     }
     else
     {
       for (int i = 0; i < WORD_SIZE; i++)
       {
-        // TODO: fix hint substring
         char letterGoal = wordGoal[i];
-        if (letterGuess == letterGoal)
+        if (letterGoal == letterGuess)
         {
           wordGuess[hint][columnPos] = '^';
           i = WORD_SIZE;
         }
         else
         {
-          wordGuess[hint][columnPos] = 'x';
+          wordGuess[hint][columnPos] = ' ';
         }
       }
     }
@@ -106,7 +110,7 @@ void startGame(char wordGoal[WORD_SIZE])
   scanf("%s", &wordGuess);
 
   toLowerCase(wordGuess);
-  compareSubString(wordGoal,wordGuess);
+  compareWordGuess(wordGoal,wordGuess);
 }
 
 int main()
