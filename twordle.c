@@ -45,7 +45,7 @@ void getGoalWord(FILE *file, char word[WORD_SIZE])
   }
 }
 
-void compareSubString(char wordGoal[WORD_SIZE], char wordGuess[ROW_SIZE][COL_SIZE])
+void compareWordGuess(char wordGoal[WORD_SIZE], char wordGuess[ROW_SIZE][COL_SIZE])
 {
   int columnPos;
   int goal = 0;
@@ -95,7 +95,6 @@ void toLowerCase(char wordGuess[ROW_SIZE][COL_SIZE])
       wordGuess[row][i] += CHANGE_CASE;
     }
   }
-  printf("new lowercase word: %s\n", wordGuess[row]);
 }
 
 void startGame(char wordGoal[WORD_SIZE])
