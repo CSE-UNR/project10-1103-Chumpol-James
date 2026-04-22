@@ -6,32 +6,42 @@
 #define TRUE 1
 #define FALSE 0
 #define ERR 1
-#define ROW_SIZE 2
-#define WORD_SIZE 5
-#define COL_SIZE 10
+#define ROW_SIZE 6
+#define COL_SIZE 5
 #define CHANGE_CASE 32
+#define MAX_ATTEMPT 6
+#define SPACE ' '
+#define CARET '^'
+#define TERMINATOR '\0'
 
-int foundFile(FILE *file)
-{
-  if (file)
-  {
-    return TRUE;
-  }
-  printf("Unable to open file.\n");
-  return FALSE;
-}
-
-// Test function to quickly print 2D arrays.
+// * Function to quickly print 2D arrays
 void printArr(char arr[ROW_SIZE][COL_SIZE], int row)
 {
-  for (int i = 0; i < WORD_SIZE; i++)
+  for (int currentPos = 0; currentPos < COL_SIZE; currentPos++)
   {
-    printf("%c", arr[row][i]);
+    printf("%c", arr[row][currentPos]);
   }
   printf("\n");
 }
 
-void getGoalWord(FILE *file, char word[WORD_SIZE])
+// * Custom print function with an implicit line break
+// * cuz I forget \n a lot
+void printLine(const char* format, ...)
+{
+  printf(format);
+  printf("\n");
+}
+
+FILE* foundFile(FILE *file)
+{
+  if (!file)
+  {
+    printLine("Unable to open file.");
+  }
+  return file;
+}
+
+void getGoalWord(FILE *file, char word[COL_SIZE])
 {
   char inputChar;
   int columnPos;
@@ -45,87 +55,205 @@ void getGoalWord(FILE *file, char word[WORD_SIZE])
   }
 }
 
-void compareWordGuess(char wordGoal[WORD_SIZE], char wordGuess[ROW_SIZE][COL_SIZE])
+void processGuess
+(
+  char wordGoal[COL_SIZE],
+  char wordGuess[ROW_SIZE][COL_SIZE],
+  char hintRow[ROW_SIZE][COL_SIZE],
+  int currentRow
+)
 {
-  int columnPos;
-  const int goal = 0;
-  const int hint = 1;
-  printf("\n");
-  
-  for (columnPos = 0; columnPos < WORD_SIZE; columnPos++)
+  for (int columnPos = 0; columnPos < COL_SIZE; columnPos++)
   {
     char letterGoal = wordGoal[columnPos];
-    char letterGuess = wordGuess[goal][columnPos];
+    char letterGuess = wordGuess[currentRow][columnPos];
+    char letterHint = hintRow[currentRow][columnPos];
     if (letterGoal == letterGuess)
     {
-      wordGuess[goal][columnPos] -= CHANGE_CASE;
-      // Place space char in hint row if found matching letter
-      // This is to make sure the hint row has a printable characters
-      wordGuess[hint][columnPos] = ' ';
+      wordGuess[currentRow][columnPos] -= CHANGE_CASE;
+      // * Place space char in hint row if found matching letter
+      // * This is to make sure the hint row has printable characters
+      hintRow[currentRow][columnPos] = SPACE;
     }
     else
     {
-      for (int i = 0; i < WORD_SIZE; i++)
+      for (int i = 0; i < COL_SIZE; i++)
       {
         char letterGoal = wordGoal[i];
         if (letterGoal == letterGuess)
         {
-          wordGuess[hint][columnPos] = '^';
-          i = WORD_SIZE;
+          hintRow[currentRow][columnPos] = '^';
+          i = COL_SIZE;
         }
         else
         {
-          wordGuess[hint][columnPos] = ' ';
+          hintRow[currentRow][columnPos] = SPACE;
         }
       }
     }
   }
+}
 
-  printf("%s", wordGuess);
-  if (wordGuess[hint])
+int compareWordGuess
+(
+  char wordGoal[COL_SIZE],
+  char wordGuess[ROW_SIZE][COL_SIZE],
+  char hintRow[ROW_SIZE][COL_SIZE],
+  int currentRow
+)
+{
+  int matchCounter = 0;
+  for (int currentPos = 0; currentPos < COL_SIZE; currentPos++)
   {
-    printf("\n%s\n", wordGuess[hint]);
+    if (wordGuess[currentRow][currentPos] >= 'A' && wordGuess[currentRow][currentPos] <= 'Z')
+    {
+      matchCounter++;
+    }
+  }
+
+  if (matchCounter == COL_SIZE)
+  {
+    printArr(wordGuess, currentRow);
+    return TRUE;
+  }
+  else
+  {
+    for (int i = 0; i <= currentRow; i++)
+    {
+      printArr(wordGuess, i);
+      printArr(hintRow, i);
+    }
+    printLine("Matched #: %d", matchCounter);
+    return FALSE;
   }
 }
 
-void toLowerCase(char wordGuess[ROW_SIZE][COL_SIZE])
+void toLowerCase(char wordGuess[ROW_SIZE][COL_SIZE], int currentRow)
 {
-  int row = 0;
-  for (int i = 0; i < WORD_SIZE; i++)
+  for (int i = 0; i < COL_SIZE; i++)
   {
-    if (wordGuess[row][i] == '\0') return;
-    if (wordGuess[row][i] >= 'A' && wordGuess[row][i] <= 'Z')
+    if (wordGuess[currentRow][i] == '\0') return;
+    if (wordGuess[currentRow][i] >= 'A' && wordGuess[currentRow][i] <= 'Z')
     {
-      wordGuess[row][i] += CHANGE_CASE;
+      wordGuess[currentRow][i] += CHANGE_CASE;
     }
   }
 }
 
-void startGame(char wordGoal[WORD_SIZE])
+void getUserGuess
+(
+  char wordGuess[ROW_SIZE][COL_SIZE],
+  int currentRow,
+  int currentAttempt
+)
 {
-  int attempt = 1;
-  printf("GUESS %d: ", attempt);
+  scanf("%s", &wordGuess[currentRow]);
 
+  char lastLetter = wordGuess[currentRow][COL_SIZE - 1];
+  char lookAhead = wordGuess[currentRow][COL_SIZE];
+  while (lastLetter == TERMINATOR || lookAhead != TERMINATOR)
+  {
+    printArr(wordGuess, currentRow);
+
+    // * Flush current row
+    for (int i = 0; i < COL_SIZE; i++)
+    {
+      wordGuess[currentRow][i] = TERMINATOR;
+    }
+
+    printLine("Please enter a word that is 5 letters long.");
+    printf("GUESS %d: ", currentAttempt);
+    scanf("%s", &wordGuess[currentRow]);
+
+    lastLetter = wordGuess[currentRow][COL_SIZE - 1];
+    lookAhead = wordGuess[currentRow][COL_SIZE];
+  }
+  return;
+}
+
+void startTwordle(char wordGoal[COL_SIZE])
+{
+  printLine("Welcome to Twordle!");
+  printLine("Please enter your first guess that is 5 letters long.");
+
+  int currentAttempt = 1;
+  int currentRow = currentAttempt - 1;
   char wordGuess[ROW_SIZE][COL_SIZE] = {0};
-  scanf("%s", &wordGuess);
+  char hintRow[ROW_SIZE][COL_SIZE] = {0};
+  do
+  {
+    switch(currentAttempt)
+    {
+      default:
+        printf("\nGUESS %d: ", currentAttempt);
+        break;
+      case MAX_ATTEMPT:
+        printf("\nFINAL GUESS: ");
+    }
+    getUserGuess(wordGuess, currentRow, currentAttempt);
+    printLine("==============");
 
-  toLowerCase(wordGuess);
-  compareWordGuess(wordGoal,wordGuess);
+    toLowerCase(wordGuess,currentRow);
+    processGuess(wordGoal, wordGuess, hintRow, currentRow);
+
+    if (compareWordGuess(wordGoal, wordGuess, hintRow, currentRow))
+    {
+      switch(currentAttempt)
+      {
+        case 1:
+          printLine("You found the word on your first try!", currentAttempt);
+          break;
+        default:
+          printLine("You found the word in %d attempts!", currentAttempt);
+      }
+      switch(currentAttempt)
+      {
+        case 1:
+          printLine("GOATED.");
+          return;
+        case 2:
+          printLine("Epic!");
+          return;
+        case 3:
+          printLine("Sweet!");
+          return;
+        case 4:
+        case 5:
+          printLine("Nice!");
+          return;
+        case MAX_ATTEMPT:
+        default:
+          return;
+      }
+    }
+    else
+    {
+      currentAttempt++;
+      if (currentAttempt <= MAX_ATTEMPT)
+      {
+        currentRow++;
+      }
+      for (int currentPos = 0; currentPos < COL_SIZE; currentPos++)
+      {
+        wordGuess[currentRow][currentPos] = 0;
+      }
+    }
+  } while (currentAttempt <= MAX_ATTEMPT);
+
+  printLine("You lost! Better luck next time!");
+  return;
 }
 
 int main()
 {
   FILE *inputFile = fopen(WORDFILE, "r");
-  if (!foundFile(inputFile))
-  {
-    return ERR;
-  }
+  if (!foundFile(inputFile)) return ERR;
 
-  char wordGoal[WORD_SIZE];
+  char wordGoal[COL_SIZE];
   getGoalWord(inputFile, wordGoal);
   fclose(inputFile);
 
-  printf("Welcome to Twordle!\n");
-  printf("Please enter your first guess that is 5 letters long.\n");
-  startGame(wordGoal);
+  startTwordle(wordGoal);
+
+  return 0;
 }
