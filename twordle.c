@@ -22,7 +22,6 @@ void printArr(char arr[ROW_SIZE][COL_SIZE], int row)
     printf("%c", arr[row][currentPos]);
   }
   printf("\n");
-  return;
 }
 
 // * Custom print function with an implicit line break
@@ -31,7 +30,6 @@ void printLine(const char* format, ...)
 {
   printf(format);
   printf("\n");
-  return;
 }
 
 FILE* foundFile(FILE *file)
@@ -55,7 +53,6 @@ void getGoalWord(FILE *file, char word[COL_SIZE])
     }
     word[columnPos] = inputChar;
   }
-  return;
 }
 
 void processGuess
@@ -77,9 +74,9 @@ void processGuess
       // * subtract ascii value of 32 to get upper case equivalent
       wordGuess[currentRow][columnPos] -= CHANGE_CASE;
 
-      // * Place null chars in hint array if found matching letter
+      // * Place spaces in hint array if found matching letter
       // * This is to make sure the hint row has something printable
-      hintArr[currentRow][columnPos] = TERMINATOR;
+      hintArr[currentRow][columnPos] = SPACE;
     }
     else
     {
@@ -92,7 +89,6 @@ void processGuess
         if (letterGoal == letterGuess)
         {
           hintArr[currentRow][columnPos] = '^';
-          printLine("Placed caret at column: %d", columnPos);
           i = COL_SIZE;
         }
         else
@@ -102,7 +98,6 @@ void processGuess
       }
     }
   }
-  return;
 }
 
 int compareWordGuess
@@ -152,7 +147,6 @@ void toLowerCase(char wordGuess[ROW_SIZE][COL_SIZE], int currentRow)
       wordGuess[currentRow][currentPos] += CHANGE_CASE;
     }
   }
-  return;
 }
 
 void flushRow(char wordGuess[ROW_SIZE][COL_SIZE], int currentRow)
@@ -193,6 +187,7 @@ void getUserGuess
   }
 
   int RESET = 0;
+  // * Loops prompt if non-alpha character is found
   for (int i = 0; i < COL_SIZE; i++)
   {
     char currentElement = wordGuess[currentRow][i];
@@ -205,7 +200,6 @@ void getUserGuess
       scanf("%s", &wordGuess[currentRow]);
     }
   }
-  return;
 }
 
 void startTwordle(char wordGoal[COL_SIZE])
@@ -279,7 +273,6 @@ void startTwordle(char wordGoal[COL_SIZE])
   } while (currentAttempt <= MAX_ATTEMPT);
 
   printLine("You lost! Better luck next time!");
-  return;
 }
 
 int main()
