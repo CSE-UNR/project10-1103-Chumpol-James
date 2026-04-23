@@ -92,6 +92,7 @@ void processGuess
         if (letterGoal == letterGuess)
         {
           hintArr[currentRow][columnPos] = '^';
+          printLine("Placed caret at column: %d", columnPos);
           i = COL_SIZE;
         }
         else
@@ -136,7 +137,6 @@ int compareWordGuess
       printArr(wordGuess, i);
       printArr(hintArr, i);
     }
-    printLine("Matched #: %d", matchCounter);
     return FALSE;
   }
 }
@@ -153,6 +153,14 @@ void toLowerCase(char wordGuess[ROW_SIZE][COL_SIZE], int currentRow)
     }
   }
   return;
+}
+
+void flushRow(char wordGuess[ROW_SIZE][COL_SIZE], int currentRow)
+{
+  for (int currentPos = 0; currentPos < COL_SIZE; currentPos++)
+  {
+    wordGuess[currentRow][currentPos] = TERMINATOR;
+  }
 }
 
 void getUserGuess
@@ -173,10 +181,7 @@ void getUserGuess
     printArr(wordGuess, currentRow);
 
     // * Flush current row
-    for (int currentPos = 0; currentPos < COL_SIZE; currentPos++)
-    {
-      wordGuess[currentRow][currentPos] = TERMINATOR;
-    }
+    flushRow(wordGuess, currentRow);
 
     printLine("Please enter a word that is 5 letters long.");
     printf("GUESS %d: ", currentAttempt);
@@ -185,6 +190,20 @@ void getUserGuess
     // * Update the value of the variables
     lastLetter = wordGuess[currentRow][COL_SIZE - 1];
     lookAhead = wordGuess[currentRow][COL_SIZE];
+  }
+
+  int RESET = 0;
+  for (int i = 0; i < COL_SIZE; i++)
+  {
+    char currentElement = wordGuess[currentRow][i];
+    if ( (!(currentElement >= 'A' && currentElement <= 'Z') && !(currentElement >= 'a' && currentElement <= 'z')) || !(currentElement != TERMINATOR) )
+    {
+      i = RESET;
+      flushRow(wordGuess, currentRow);
+      printLine("Use alphabetical characters only.");
+      printf("GUESS %d: ", currentAttempt);
+      scanf("%s", &wordGuess[currentRow]);
+    }
   }
   return;
 }
