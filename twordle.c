@@ -212,7 +212,7 @@ void getUserGuess
     switch(exception)
     {
       case INVALID_CHAR:
-        printLine("Use alphabetical characters only.");
+        printLine("Please use alphabetical characters only.");
         break;
 
       case INVALID_LENGTH:
