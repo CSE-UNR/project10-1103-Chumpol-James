@@ -2,7 +2,7 @@
 // CS135, Section 1001/1103
 
 #include <stdio.h>
-#define WORDFILE "mystery.txt"
+#define WORDFILE "word.txt"
 #define TRUE 1
 #define FALSE 0
 #define ERR 1
