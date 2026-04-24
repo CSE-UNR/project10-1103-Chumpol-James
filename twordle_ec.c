@@ -204,6 +204,7 @@ void getUserGuess
         if (currentElement == futureElement)
         {
           exception = DUPLICATE_FOUND;
+          x = EXIT_LOOP;
         }
       }
 
