@@ -1,6 +1,10 @@
 // James Chumpol
 // CS135, Section 1001/1103
 
+// Extra credit file
+// Implements feature to check for duplicate letters
+// File is identical to main because reading directions is hard
+
 #include <stdio.h>
 #define WORDFILE "mystery.txt"
 #define TRUE 1
