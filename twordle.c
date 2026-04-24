@@ -13,6 +13,9 @@
 #define SPACE ' '
 #define CARET '^'
 #define TERMINATOR '\0'
+#define INVALID_LENGTH 1
+#define INVALID_CHAR 2
+#define DUPLICATE_FOUND 3
 
 // * Function to quickly print 2D arrays
 void printArr(char arr[ROW_SIZE][COL_SIZE], int row)
@@ -166,40 +169,73 @@ void getUserGuess
 {
   scanf("%s", &wordGuess[currentRow]);
 
-  char lastLetter = wordGuess[currentRow][COL_SIZE - 1];
-  char lookAhead = wordGuess[currentRow][COL_SIZE];
-  // * Loops prompt if null character is found in last place
-  // * or if there is a non-null character after last place
-  while (lastLetter == TERMINATOR || lookAhead != TERMINATOR)
+  int exception;
+  const int EXIT_LOOP = COL_SIZE;
+  do
   {
-    printArr(wordGuess, currentRow);
-
-    // * Flush current row
-    flushRow(wordGuess, currentRow);
-
-    printLine("Please enter a word that is 5 letters long.");
-    printf("GUESS %d: ", currentAttempt);
-    scanf("%s", &wordGuess[currentRow]);
-
-    // * Update the value of the variables
-    lastLetter = wordGuess[currentRow][COL_SIZE - 1];
-    lookAhead = wordGuess[currentRow][COL_SIZE];
-  }
-
-  int RESET = 0;
-  // * Loops prompt if non-alpha character is found
-  for (int i = 0; i < COL_SIZE; i++)
-  {
-    char currentElement = wordGuess[currentRow][i];
-    if ( (!(currentElement >= 'A' && currentElement <= 'Z') && !(currentElement >= 'a' && currentElement <= 'z')) || !(currentElement != TERMINATOR) )
+    exception = 0;
+    for (int i = 0; i < COL_SIZE; i++)
     {
-      i = RESET;
+      char currentElement = wordGuess[currentRow][i];
+      char lastLetter = wordGuess[currentRow][COL_SIZE - 1];
+      char lookAhead = wordGuess[currentRow][COL_SIZE];
+
+      // * Detects if null character is found in place of last letter
+      // * or if there is a non-null character after last place
+      if ( lastLetter == TERMINATOR || lookAhead != TERMINATOR )
+      {
+        exception = INVALID_LENGTH;
+      }
+
+      // * Detects invalid characters
+      if ( ( !( currentElement >= 'A' && currentElement <= 'Z' ) && !( currentElement >= 'a' && currentElement <= 'z' ) ) || !( currentElement != TERMINATOR ) )
+      {
+        exception = INVALID_CHAR;
+      }
+      
+      // * Detects duplicate letters
+      for (int x = i + 1; x < COL_SIZE; x++)
+      {
+        char futureElement = wordGuess[currentRow][x];
+        if (currentElement == futureElement)
+        {
+          exception = DUPLICATE_FOUND;
+        }
+      }
+
+      if (exception)
+      {
+        i = EXIT_LOOP;
+      }
+    }
+  
+    switch(exception)
+    {
+      case INVALID_CHAR:
+        printLine("Use alphabetical characters only.");
+        break;
+
+      case INVALID_LENGTH:
+        printLine("Please enter a word that is exactly 5 letters in length.");
+        break;
+
+      case DUPLICATE_FOUND:
+        printLine("Please enter a word with unique, non-duplicate letters.");
+        break;
+
+      default:
+        break;
+    }
+    
+    if (exception)
+    {
       flushRow(wordGuess, currentRow);
-      printLine("Use alphabetical characters only.");
       printf("GUESS %d: ", currentAttempt);
       scanf("%s", &wordGuess[currentRow]);
+      printLine("current word: %s", wordGuess[currentRow]);
     }
-  }
+
+  } while (exception);
 }
 
 void startTwordle(char wordGoal[COL_SIZE])
