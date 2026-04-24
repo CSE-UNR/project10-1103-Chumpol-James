@@ -91,7 +91,7 @@ void processGuess
         char letterGoal = wordGoal[i];
         if (letterGoal == letterGuess)
         {
-          hintArr[currentRow][columnPos] = '^';
+          hintArr[currentRow][columnPos] = CARET;
           i = COL_SIZE;
         }
         else
