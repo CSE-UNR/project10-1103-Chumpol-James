@@ -174,9 +174,9 @@ void getUserGuess
   do
   {
     exception = 0;
-    for (int i = 0; i < COL_SIZE; i++)
+    for (int currentPos = 0; currentPos < COL_SIZE; currentPos++)
     {
-      char currentElement = wordGuess[currentRow][i];
+      char currentElement = wordGuess[currentRow][currentPos];
       char lastLetter = wordGuess[currentRow][COL_SIZE - 1];
       char lookAhead = wordGuess[currentRow][COL_SIZE];
 
@@ -194,7 +194,7 @@ void getUserGuess
       }
       
       // * Detects duplicate letters
-      for (int x = i + 1; x < COL_SIZE; x++)
+      for (int x = currentPos + 1; x < COL_SIZE; x++)
       {
         char futureElement = wordGuess[currentRow][x];
         if (currentElement == futureElement)
@@ -205,7 +205,7 @@ void getUserGuess
 
       if (exception)
       {
-        i = EXIT_LOOP;
+        currentPos = EXIT_LOOP;
       }
     }
   
