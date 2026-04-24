@@ -3,7 +3,7 @@
 
 // Extra credit file
 // Implements feature to check for duplicate letters
-// File is identical to main because reading directions is hard
+// Feature is also implemented in main because reading directions is hard
 
 #include <stdio.h>
 #define WORDFILE "mystery.txt"
@@ -235,7 +235,14 @@ void getUserGuess
     if (exception)
     {
       flushRow(wordGuess, currentRow);
-      printf("GUESS %d: ", currentAttempt);
+      switch(currentAttempt)
+      {
+        default:
+          printf("GUESS %d: ", currentAttempt);
+          break;
+        case MAX_ATTEMPT:
+          printf("FINAL GUESS: ");
+      }
       scanf("%s", &wordGuess[currentRow]);
       printLine("current word: %s", wordGuess[currentRow]);
     }
